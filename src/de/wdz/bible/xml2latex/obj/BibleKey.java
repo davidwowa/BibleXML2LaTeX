@@ -5,7 +5,10 @@ public class BibleKey {
 	private int bookNumber;
 	private int chapterNumber;
 	private int versNumber;
-	private String language;
+
+	private int acrossSum;
+
+	private String readableKey;
 
 	public int getBookNumber() {
 		return bookNumber;
@@ -31,11 +34,49 @@ public class BibleKey {
 		this.versNumber = versNumber;
 	}
 
-	public String getLanguage() {
-		return language;
+	public int getAcrossSum() {
+		acrossSum = this.bookNumber + this.chapterNumber + this.versNumber;
+		return acrossSum;
 	}
 
-	public void setLanguage(String language) {
-		this.language = language;
+	public void setAcrossSum(int acrossSum) {
+		this.acrossSum = acrossSum;
+	}
+
+	public String getReadableKey() {
+		readableKey = new String(this.bookNumber + "_" + this.chapterNumber + "_" + this.versNumber);
+		return readableKey;
+	}
+
+	public void setReadableKey(String readableKey) {
+		this.readableKey = readableKey;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + bookNumber;
+		result = prime * result + chapterNumber;
+		result = prime * result + versNumber;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BibleKey other = (BibleKey) obj;
+		if (bookNumber != other.bookNumber)
+			return false;
+		if (chapterNumber != other.chapterNumber)
+			return false;
+		if (versNumber != other.versNumber)
+			return false;
+		return true;
 	}
 }

@@ -1,6 +1,8 @@
 package de.wdz.bible.xml2latex.output;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.w3c.dom.Element;
@@ -15,7 +17,7 @@ public class LaTeXParser {
 
 	private StringBuilder currentStringBuilder;
 
-	private Map<BibleKey, BibleVers> bibleTextMap;
+	private Map<Integer, List<BibleVers>> bibleTextMap;
 
 	private int bookCounter = 1;
 	private int chapterCounter = 1;
@@ -23,7 +25,7 @@ public class LaTeXParser {
 
 	public LaTeXParser() {
 		currentStringBuilder = new StringBuilder();
-		bibleTextMap = new HashMap<BibleKey, BibleVers>();
+		bibleTextMap = new HashMap<Integer, List<BibleVers>>();
 	}
 
 	public void parse(NodeList nodeList, String language) {
@@ -66,7 +68,8 @@ public class LaTeXParser {
 								String pathFileName = "resources/LaTeX/" + this.language + "_BIBLEBOOK_" + bookCounter
 										+ ".tex";
 
-								LaTeXWriter.writeToFile(pathFileName, currentStringBuilder.toString());
+								// TODO write LaTeX-File not in use yet
+								// LaTeXWriter.writeToFile(pathFileName, currentStringBuilder.toString());
 								currentStringBuilder = null;
 								currentStringBuilder = new StringBuilder();
 
@@ -84,18 +87,24 @@ public class LaTeXParser {
 						}
 
 						if ("vnumber".equals(node.getNodeName())) {
-							currentStringBuilder.append("\\begin{tcolorbox}\n");
-							currentStringBuilder.append("\\textsubscript{");
-							currentStringBuilder.append(node.getNodeValue());
-							currentStringBuilder.append("}");
-							currentStringBuilder.append(" ");
-							currentStringBuilder.append(tempNode.getTextContent());
-							currentStringBuilder.append("\n");
-							currentStringBuilder.append("\\end{tcolorbox}\n");
 
+							StringBuilder laTeXBuilder = new StringBuilder();
+
+							laTeXBuilder.append("\\begin{tcolorbox}\n");
+							laTeXBuilder.append("\\textsubscript{");
+							laTeXBuilder.append(node.getNodeValue());
+							laTeXBuilder.append("}");
+							laTeXBuilder.append(" ");
+							laTeXBuilder.append(tempNode.getTextContent());
+							laTeXBuilder.append("\n");
+							laTeXBuilder.append("\\end{tcolorbox}\n");
+
+							currentStringBuilder.append(laTeXBuilder.toString());
+
+							// TODO xml, json parts
+							
 							// add to map
 							BibleKey bibleKey = new BibleKey();
-							bibleKey.setLanguage(this.language);
 							bibleKey.setBookNumber(this.bookCounter);
 							bibleKey.setChapterNumber(this.chapterCounter);
 							int versNumber = new Integer(node.getNodeValue());
@@ -105,7 +114,15 @@ public class LaTeXParser {
 							bibleVers.setLanguage(this.language);
 							bibleVers.setVers(tempNode.getTextContent());
 
-							bibleTextMap.put(bibleKey, bibleVers);
+							bibleVers.setLatexString(laTeXBuilder.toString());
+
+							if (!bibleTextMap.containsKey(bibleKey.getAcrossSum())) {
+								List<BibleVers> versesList = new ArrayList<BibleVers>();
+								versesList.add(bibleVers);
+								bibleTextMap.put(bibleKey.getAcrossSum(), versesList);
+							} else {
+								bibleTextMap.get(bibleKey.getAcrossSum()).add(bibleVers);
+							}
 						}
 					}
 				}
@@ -134,11 +151,11 @@ public class LaTeXParser {
 		return null;
 	}
 
-	public Map<BibleKey, BibleVers> getBibleTextMap() {
+	public Map<Integer, List<BibleVers>> getBibleTextMap() {
 		return bibleTextMap;
 	}
 
-	public void setBibleTextMap(Map<BibleKey, BibleVers> bibleTextMap) {
+	public void setBibleTextMap(Map<Integer, List<BibleVers>> bibleTextMap) {
 		this.bibleTextMap = bibleTextMap;
 	}
 }
