@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -15,6 +16,8 @@ import de.wdz.bible.xml2latex.obj.BibleVers;
 
 public class LaTeXParser {
 
+	private Logger logger = Logger.getLogger(LaTeXParser.class);
+
 	private StringBuilder currentStringBuilder;
 
 	private Map<Integer, List<BibleVers>> bibleTextMap;
@@ -24,11 +27,15 @@ public class LaTeXParser {
 	private String language;
 
 	public LaTeXParser() {
+		logger.info("create instance of " + this.getClass().getName());
+
 		currentStringBuilder = new StringBuilder();
 		bibleTextMap = new HashMap<Integer, List<BibleVers>>();
 	}
 
 	public void parse(NodeList nodeList, String language) {
+		logger.info("parse text for language " + language);
+
 		this.language = language;
 		bookCounter = 1;
 		chapterCounter = 1;
@@ -69,7 +76,7 @@ public class LaTeXParser {
 										+ ".tex";
 
 								// TODO write LaTeX-File not in use yet
-								// LaTeXWriter.writeToFile(pathFileName, currentStringBuilder.toString());
+								LaTeXWriter.writeToFile(pathFileName, currentStringBuilder.toString());
 								currentStringBuilder = null;
 								currentStringBuilder = new StringBuilder();
 
@@ -102,7 +109,7 @@ public class LaTeXParser {
 							currentStringBuilder.append(laTeXBuilder.toString());
 
 							// TODO xml, json parts
-							
+
 							// add to map
 							BibleKey bibleKey = new BibleKey();
 							bibleKey.setBookNumber(this.bookCounter);
@@ -138,6 +145,7 @@ public class LaTeXParser {
 
 	// found on
 	// http://stackoverflow.com/questions/4076910/how-to-retrieve-element-value-of-xml-using-java
+	@SuppressWarnings("unused")
 	@Deprecated
 	private String getString(String tagName, Element element) {
 		NodeList list = element.getElementsByTagName(tagName);

@@ -3,15 +3,17 @@ package de.wdz.bible.xml2latex;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.w3c.dom.NodeList;
 
 import de.wdz.bible.xml2latex.input.XMLReader;
-import de.wdz.bible.xml2latex.obj.BibleKey;
 import de.wdz.bible.xml2latex.obj.BibleVers;
 import de.wdz.bible.xml2latex.output.LaTeXParser;
 import de.wdz.bible.xml2latex.xml.XMLHandler;
 
 public class Main {
+
+	static Logger logger = Logger.getLogger(Main.class);
 
 	// TODO find another version, without booknumbers
 	private static String ru = "resources/SF_2009-01-20_RUS_RUSSUB_(RUSSIAN VERSION).xml";
@@ -25,6 +27,7 @@ public class Main {
 
 	public static void main(String[] args) {
 
+		logger.info("start with parsing");
 		LaTeXParser laTeXParser = new LaTeXParser();
 
 		XMLReader uaLangXMLReader = new XMLReader(ua);
@@ -50,13 +53,15 @@ public class Main {
 		XMLHandler enBibleXMLHandler = new XMLHandler(enBibleAsXML);
 
 		NodeList enNodeList = enBibleXMLHandler.getRoot().getElementsByTagName("BIBLEBOOK");
-		
+
 		laTeXParser.parse(uaNodeList, "ua");
 		laTeXParser.parse(ruNodeList, "ru");
 		laTeXParser.parse(deNodeList, "de");
 		laTeXParser.parse(enNodeList, "en");
-		
+
+		// contains all data
 		Map<Integer, List<BibleVers>> bibleMap = laTeXParser.getBibleTextMap();
-		System.out.println("X");
+
+		logger.info("end with job");
 	}
 }
